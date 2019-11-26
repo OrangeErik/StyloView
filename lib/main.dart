@@ -14,6 +14,7 @@ void main(){
 			)
 		],
 		child: MaterialApp(
+			title: "StyloView",
 			home:  MainWin(),
 		)
 	));

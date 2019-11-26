@@ -10,7 +10,7 @@
 	<uses-sdk android:minSdkVersion="24"/>
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="stylo_view"
+        android:label="StyloView"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

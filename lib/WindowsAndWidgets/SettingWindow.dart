@@ -59,7 +59,7 @@ class _AuthFormState extends State<AuthForm> {
 	Widget build(BuildContext context){
 		return p.Consumer<AppState>(
 			builder: (context, appState, child){
-				if(appState.GetAuth.AuthState != AccessState.auth){ // если не авторизирован то...
+				if(appState.getAuth.AuthState != AccessState.auth){ // если не авторизирован то...
 					return  Column(
 					  children: <Widget>[
 					    Form(
@@ -84,8 +84,8 @@ class _AuthFormState extends State<AuthForm> {
 					    							err = C.s_enterYourDomain;
 					    						else {
 					    							File("${C.Dir}/${C.s_DOMAINNAMEFILE}").writeAsString(value.trim());
-					    							appState.SetAuthDomain(value.trim());
-					    							appState.GetGlobalAccountList(context, appState.GetAuth.DomainName);
+					    							appState.setAuthDomain(value.trim());
+					    							appState.getGlobalAccountList(context, appState.getAuth.DomainName);
 					    						}
 					    						return err;
 					    					},
@@ -119,7 +119,7 @@ class _AuthFormState extends State<AuthForm> {
 									  Padding( //ввод пароля
 										  padding: const EdgeInsets.all(8.0),
 										  child  : TextFormField(
-											  enabled: appState.GetAuth.Name != null ? true : false,
+											  enabled: appState.getAuth.Name != null ? true : false,
 											  obscureText: true, //скрывает текст в поле
 											  decoration : InputDecoration(
 												  labelText: C.s_pass,
@@ -133,7 +133,7 @@ class _AuthFormState extends State<AuthForm> {
 												  if(value.isEmpty)
 													  err = C.s_enterYourPass;
 												  else {
-													  appState.LogIn(context: context, password: value, rememberMe: _RememberMe);
+													  appState.logIn(context: context, password: value, rememberMe: _RememberMe);
 												  }
 												  return err;
 											  },
@@ -164,7 +164,7 @@ class _AuthFormState extends State<AuthForm> {
 															  RaisedButton(
 																  padding: EdgeInsets.symmetric(horizontal: 40.0),
 																  onPressed: () async {
-																	  if(appState.GetAuth.DomainName != null){
+																	  if(appState.getAuth.DomainName != null){
 																		  _GlobalAccFormKey.currentState.validate();
 																	  }
 																  },
@@ -191,7 +191,7 @@ class _AuthFormState extends State<AuthForm> {
 									padding: const EdgeInsets.all(8.0),
 									child  : RaisedButton(
 										onPressed: () {
-											appState.LogOut();
+											appState.logOut();
 											print('Signed OUT');
 										},
 										child: Text(C.s_signout),
