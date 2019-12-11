@@ -300,13 +300,6 @@ Function callbackGetCFG = (http.Response response){
 	print(decrypted);
 };
 
-//////void main(){
-////////	String envelope = CreateEnvelope("auth", {"email":"erik.work2018@yandex.ru", "password": "Ican_progger"});
-////////	String envelope = CreateEnvelope("getGoodsByName", {"token":"B1D68706A221A608A6741C53A6B0BB7A3A6A913C30E9088B83931CD93B55F050", "name": "гель для душа"});
-////////	UhttRequest("www.uhtt.ru", "http://www.uhtt.ru/dispatcher/ws/iface", "getCommonMqsConfig", callbackGetCFG);
-//////}
-
-
 String XmlSymbReplace(String str){
 	Map<String, String> symbs = {".":"&dot;", ",":"&comma;", "/":"&fwsl;"};
 	symbs.forEach((key, val){

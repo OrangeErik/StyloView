@@ -15,8 +15,8 @@ class DataDrawer extends StatelessWidget {
 						child: Column(
 							crossAxisAlignment: CrossAxisAlignment.start,
 							children: <Widget>[
-								Text( C.s_domain +': ${p.Provider.of<AppState>(context).getAuth.DomainName ?? 'not auth'}'),
-								Text( C.s_login +': ${p.Provider.of<AppState>(context).getAuth.Name ?? ''}')
+								Text( C.s_domain +': ${p.Provider.of<AppState>(context).GetAuth.DomainName ?? 'not auth'}'),
+								Text( C.s_login +': ${p.Provider.of<AppState>(context).GetAuth.Name ?? ''}')
 							],
 						),
 						decoration: BoxDecoration(
@@ -38,7 +38,7 @@ class ReportsList extends StatelessWidget {
 		return p.Consumer<AppState>(
 			builder: (context, appState, child){
 				return Column(
-					children: appState.choiceList ?? <Widget>[],
+					children: appState.ChoiceList ?? <Widget>[],
 				);
 			},
 		);

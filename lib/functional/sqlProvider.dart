@@ -2,7 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:StyloView/functional/StyloViewLib.dart';
 
-class SqlData {// Структура данных, с коротой работает класс SqlProvider.
+class SqlRow {// Структура данных, с коротой работает класс SqlProvider.
 	int Id = 0;
 	final String ReportName;
 	final String MetaData;
@@ -11,37 +11,37 @@ class SqlData {// Структура данных, с коротой работ�
 	final List<int> Total;
 	final List<int> Reserve;
 
-	SqlData({this.Id, this.ReportName, this.MetaData, this.DateTime, this.CompressXmlData, this.Total, this.Reserve});
+	SqlRow({this.Id, this.ReportName, this.MetaData, this.DateTime, this.CompressXmlData, this.Total, this.Reserve});
 	Map<String, dynamic> toMap()
 	{
 		return {
-			'id'       : Id,
-			'report_name': ReportName,
-			'meta_data'  : MetaData,
-			'date_time': DateTime,
-			'xml_data' : CompressXmlData,
-			'total'    : Total,
-			'reserve'  : Reserve
+			C.DB_ROW_FIELD_ID         : Id,
+			C.DB_ROW_FIELD_REPORTNAME : ReportName,
+			C.DB_ROW_FIELD_METADATA   : MetaData,
+			C.DB_ROW_FIELD_DATETIME   : DateTime,
+			C.DB_ROW_FIELD_XMLDATA    : CompressXmlData,
+			C.DB_ROW_FIELD_TOTAL      : Total,
+			C.DB_ROW_FIELD_RESERVE    : Reserve
 		};
 	}
 	String toString()
 	{
-		return '{id: $Id,' +
-			' report_name: $ReportName,' +
-			' meta_data: $MetaData,' +
-			' date_time: $DateTime,' +
-			' xml_data: $CompressXmlData,' +
-			' total: $Total,' +
-			' reserve: $Reserve}';
+		return '{${C.DB_ROW_FIELD_ID}: $Id,' +
+			' ${C.DB_ROW_FIELD_REPORTNAME}: $ReportName,' +
+			' ${C.DB_ROW_FIELD_METADATA}: $MetaData,' +
+			' ${C.DB_ROW_FIELD_DATETIME}: $DateTime,' +
+			' ${C.DB_ROW_FIELD_XMLDATA}: $CompressXmlData,' +
+			' ${C.DB_ROW_FIELD_TOTAL}: $Total,' +
+			' ${C.DB_ROW_FIELD_RESERVE}: $Reserve}';
 	}
-	factory SqlData.fromMap(Map<String, dynamic> data) => SqlData(
-		Id        : data['id'],
-		ReportName: data['report_name'],
-		MetaData  : data['meta_data'],
-		DateTime  : data['date_time'],
-		CompressXmlData   : data['xml_data'],
-		Total     : data['total'],
-		Reserve   : data['reserve']
+	factory SqlRow.fromMap(Map<String, dynamic> data) => SqlRow(
+		Id        : data[C.DB_ROW_FIELD_ID],
+		ReportName: data[C.DB_ROW_FIELD_REPORTNAME],
+		MetaData  : data[C.DB_ROW_FIELD_METADATA],
+		DateTime  : data[C.DB_ROW_FIELD_DATETIME],
+		CompressXmlData : data[C.DB_ROW_FIELD_XMLDATA],
+		Total     : data[C.DB_ROW_FIELD_TOTAL],
+		Reserve   : data[C.DB_ROW_FIELD_RESERVE]
 	);
 
 	Map MDToMap(){
@@ -84,63 +84,63 @@ class SqlProvider{
 		});
 	}
 
-	Future<int>SetRow(String tableName, SqlData sd) async
+	Future<int>SetRow(String tableName, SqlRow sqlRow) async
 	{
 		int raw;
 		final db = await GetDb;
 		await db.transaction((trx)async{
-			await trx.execute('CREATE TABLE IF NOT EXISTS $tableName (id INTEGER PRIMARY KEY, report_name TEXT, meta_data TEXT, date_time TEXT, xml_data BLOB, reserve BLOB, total BLOB)').then((_)async{
+			await trx.execute(ExecuteString(tableName)).then((_)async{
 				raw = await trx.rawInsert(
-					'INSERT Into $tableName (report_name, meta_data, date_time, xml_data, total, reserve) VALUES (?,?,?,?,?,?)',
-					[sd.ReportName, sd.MetaData, sd.DateTime, sd.CompressXmlData, sd.Total, sd.Reserve]
+					'INSERT Into $tableName (${C.DB_ROW_FIELD_REPORTNAME}, ${C.DB_ROW_FIELD_METADATA}, ${C.DB_ROW_FIELD_DATETIME}, ${C.DB_ROW_FIELD_XMLDATA}, ${C.DB_ROW_FIELD_TOTAL}, ${C.DB_ROW_FIELD_RESERVE}) VALUES (?,?,?,?,?,?)',
+					[sqlRow.ReportName, sqlRow.MetaData, sqlRow.DateTime, sqlRow.CompressXmlData, sqlRow.Total, sqlRow.Reserve]
 				);
 			});
 		});
 		return raw;
 	}
 
-	Future<SqlData> GetRow(String tableName, int id) async
+	Future<SqlRow> GetRow(String tableName, int id) async
 	{
 		final db = await GetDb;
-		SqlData sql_data;
+		SqlRow sql_data;
 		List<Map<String, dynamic>> res;
 		await db.transaction((trx)async{
-			await trx.execute('CREATE TABLE IF NOT EXISTS $tableName (id INTEGER PRIMARY KEY, report_name TEXT, meta_data TEXT, date_time TEXT, xml_data BLOB, reserve BLOB, total BLOB)').then((_)async{
+			await trx.execute(ExecuteString(tableName)).then((_)async{
 				res = await trx.query(tableName, where: 'id = ?', whereArgs: [id]);
 			});
 		});
 		if(res.isNotEmpty)
-			sql_data =  SqlData.fromMap(res.first);
+			sql_data =  SqlRow.fromMap(res.first);
 		return sql_data;
 	}
 
-	Future<SqlData> GetRowByNameAndDate(String tableName, String name, String date_time) async
+	Future<SqlRow> GetRowByNameAndDate(String tableName, String name, String dateTime) async
 	{
 		final db = await GetDb;
-		SqlData sql_data;
+		SqlRow sql_data;
 		List<Map<String, dynamic>> res;
 		await db.transaction((trx)async{
-			await trx.execute('CREATE TABLE IF NOT EXISTS $tableName (id INTEGER PRIMARY KEY, report_name TEXT, meta_data TEXT, date_time TEXT, xml_data BLOB, reserve BLOB, total BLOB)').then((_)async{
-				res = await trx.query(tableName, where: 'report_name = ? AND date_time = ?', whereArgs: [name, date_time]);
+			await trx.execute(ExecuteString(tableName)).then((_)async{
+				res = await trx.query(tableName, where: 'report_name = ? AND date_time = ?', whereArgs: [name, dateTime]);
 			});
 		});
 		if(res.isNotEmpty)
-			sql_data =  SqlData.fromMap(res.first);
+			sql_data =  SqlRow.fromMap(res.first);
 		return sql_data;
 	}
 
-	Future<List<SqlData>> GetTable(String tableName) async
+	Future<List<SqlRow>> GetTable(String tableName) async
 	{
 		final Database db = await GetDb;  // Get a reference to the database.
 		List<Map<String, dynamic>> maps;
 		await db.transaction((trx)async{
-			await trx.execute('CREATE TABLE IF NOT EXISTS $tableName (id INTEGER PRIMARY KEY, report_name TEXT, meta_data TEXT, date_time TEXT, xml_data BLOB, reserve BLOB, total BLOB)').then((_)async{
+			await trx.execute(ExecuteString(tableName)).then((_)async{
 				maps = await trx.query(tableName);
 			});
 			// Query the table for all The SqlData.
 		});
 		return List.generate(maps.length, (i) {  // Convert the List<Map<String, dynamic> into a List<SqlData>.
-			return SqlData(
+			return SqlRow(
 				Id        : maps[i]['id'],
 				ReportName: maps[i]['report_name'],
 				MetaData  : maps[i]['meta_data'],
@@ -152,10 +152,10 @@ class SqlProvider{
 		});
 	}
 
-	Future DeleteRow(String tableName, int id) async
-	{  //Remove the XMLFile from the database.
+	Future DeleteRow(String tableName, int rowID) async
+	{
 		final db = await GetDb;//Get a reference to the database.    // Use a `where` clause to delete a specific XMLFile.
-		await db.delete(tableName, where: 'id = ?', whereArgs: [id],); // Pass the XMLFile's id as a whereArg to prevent SQL injection.
+		await db.delete(tableName, where: 'id = ?', whereArgs: [rowID],); // Pass the XMLFile's id as a whereArg to prevent SQL injection.
 	}
 
 	Future ClearTable(String tableName) async
@@ -164,26 +164,21 @@ class SqlProvider{
 		db.transaction((trx)=>trx.rawDelete('DELETE * FROM $tableName'));
 	}
 
-	Future<Map<String, List<String>>> GetReportsTitle(String tableName, List<String> clmnsNames)async
+	Future<List<Map<String, dynamic>>> GetColumns(String tableName, List<String> columnsNames)async
 	{
-		Map<String, List<String>> result = Map();
 		List<Map<String, dynamic>> out_list = [];
 		final db = await GetDb;
 		await db.transaction((trx)async{
-			await trx.execute('CREATE TABLE IF NOT EXISTS $tableName (id INTEGER PRIMARY KEY, report_name TEXT, meta_data TEXT, date_time TEXT, xml_data BLOB, reserve BLOB, total BLOB)').then((_)async{
-				await trx.rawQuery('SELECT DISTINCT ${clmnsNames.join(', ')} FROM $tableName').then((List response){
+			await trx.execute(ExecuteString(tableName)).then((_)async{
+				await trx.rawQuery('SELECT DISTINCT ${columnsNames.join(', ')} FROM $tableName').then((List response){
 					out_list = response;
 				});
 			});
 		});
-		for(int i=0; i < out_list.length; i++){
-			if(! result.containsKey(out_list[i]['report_name'])){
-				result[out_list[i]['report_name']] = [out_list[i]['date_time']];
-			}
-			else{
-				result[out_list[i]['report_name']].add(out_list[i]['date_time']);
-			}
-		}
-		return result;
+		return out_list;
+	}
+
+	String ExecuteString(String tableName) {
+		return 'CREATE TABLE IF NOT EXISTS $tableName (${C.DB_ROW_FIELD_ID} INTEGER PRIMARY KEY, ${C.DB_ROW_FIELD_REPORTNAME} TEXT, ${C.DB_ROW_FIELD_METADATA} TEXT, ${C.DB_ROW_FIELD_DATETIME} TEXT, ${C.DB_ROW_FIELD_XMLDATA} BLOB, ${C.DB_ROW_FIELD_RESERVE} BLOB, ${C.DB_ROW_FIELD_TOTAL} BLOB)';
 	}
 }

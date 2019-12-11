@@ -1,6 +1,59 @@
-import 'package:dart_amqp/dart_amqp.dart' as mq;
+library dart_amqp;
+
+
+export "src/client.dart";
+export "src/enums.dart";
+export "src/exceptions.dart";
+export "src/authentication.dart";
+export "src/protocol.dart" show MessageProperties;
+
+
+import 'dart_amqp.dart' as mq;
 import 'package:StyloView/functional/SELib.dart';
 import 'package:uuid/uuid.dart';
+
+mq.Client CreateClient(mq.ConnectionSettings connectionSetting)
+{
+	try{
+		mq.Client client = mq.Client(settings:  connectionSetting);
+		return client;
+	}
+	catch(e){
+		print(e);
+		print("Нет соединения с интернетом");
+		return null;
+	}
+}
+
+Future<mq.Channel> CreateChannelForClient(mq.Client client)async
+{
+	try{
+		mq.Channel channel =await client.channel();
+		return channel;
+	}
+	catch(e){
+		print(e);
+		print("Нет соединения с интернетом");
+		return null;
+	}
+}
+
+Future<mq.Exchange> BindExchangeForChannel(mq.Channel channel, String exchangeName, mq.ExchangeType exchangeType)async
+{
+	mq.Exchange exchange =await channel.exchange(exchangeName, exchangeType);
+	return exchange;
+}
+
+Future<mq.Queue> CreateQueue(mq.Channel channel, String queueName)async
+{
+	mq.Queue queue =await channel.queue(queueName);
+	return queue;
+}
+
+Future<void> BindExchangeAndQueueByRoutingKey(mq.Queue queue, mq.Exchange exchange, dynamic routingKey)async
+{
+	await queue.bind(exchange, routingKey);
+}
 
 class VarMQ{
 /* Descr: Флаги, используемые в различных функциях обмена сообщениями.
@@ -171,5 +224,3 @@ class RoutingParamEntry {
 	}
 //	int SetupRpcReply(const PPMqbClient::Envelope & rSrcEnv);
 }
-
-
